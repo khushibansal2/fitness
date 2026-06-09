@@ -1,25 +1,42 @@
+import argparse
+import importlib
+import json
+import math
+import time
+from typing import Dict, List, Tuple
+
 import cv2
 import mediapipe as mp
 import numpy as np
-import argparse
-import time
-import math
-from typing import Dict, List, Tuple
 from scipy import stats
-import json
+
+if not hasattr(mp, 'solutions'):
+    try:
+        mp.solutions = importlib.import_module('mediapipe.solutions')
+    except ModuleNotFoundError:
+        try:
+            mp.solutions = importlib.import_module('mediapipe.python.solutions')
+        except ModuleNotFoundError:
+            mp.solutions = None
 
 class EnhancedFitnessAnalyzer:
     def __init__(self):
-        self.mp_pose = mp.solutions.pose
-        self.mp_drawing = mp.solutions.drawing_utils
-        self.mp_drawing_styles = mp.solutions.drawing_styles
-        self.pose = self.mp_pose.Pose(
-            static_image_mode=False,
-            model_complexity=1,
-            smooth_landmarks=True,
-            min_detection_confidence=0.7,
-            min_tracking_confidence=0.5
-        )
+        self.mp_pose = None
+        self.mp_drawing = None
+        self.mp_drawing_styles = None
+        self.pose = None
+
+        if mp.solutions is not None:
+            self.mp_pose = mp.solutions.pose
+            self.mp_drawing = mp.solutions.drawing_utils
+            self.mp_drawing_styles = mp.solutions.drawing_styles
+            self.pose = self.mp_pose.Pose(
+                static_image_mode=False,
+                model_complexity=1,
+                smooth_landmarks=True,
+                min_detection_confidence=0.7,
+                min_tracking_confidence=0.5
+            )
         
         # Performance distributions for percentile scoring 
         self.performance_distributions = {
@@ -50,6 +67,10 @@ class EnhancedFitnessAnalyzer:
         self.bbox_history = []
         self.crop_padding = 0.2  # 20% padding around person
         
+    def _ensure_pose_available(self) -> None:
+        if self.pose is None or self.mp_pose is None:
+            raise RuntimeError('MediaPipe pose detection is not available in this environment')
+
     def get_person_bbox(self, landmarks, frame_width: int, frame_height: int) -> Tuple[int, int, int, int]:
         """Calculate bounding box around the person with padding"""
         if not landmarks:
@@ -247,6 +268,7 @@ class EnhancedFitnessAnalyzer:
     
     def analyze_situps(self, video_path: str, age: str, gender: str, show_overlay: bool = True) -> Dict:
         """Enhanced sit-ups analysis with auto-crop and scoring"""
+        self._ensure_pose_available()
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
@@ -372,6 +394,7 @@ class EnhancedFitnessAnalyzer:
     
     def analyze_vertical_jump(self, video_path: str, age: str, gender: str, show_overlay: bool = True) -> Dict:
         """Enhanced vertical jump analysis"""
+        self._ensure_pose_available()
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
@@ -456,6 +479,7 @@ class EnhancedFitnessAnalyzer:
     
     def analyze_broad_jump(self, video_path: str, age: str, gender: str, show_overlay: bool = True) -> Dict:
         """Enhanced broad jump analysis"""
+        self._ensure_pose_available()
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
@@ -537,6 +561,7 @@ class EnhancedFitnessAnalyzer:
     
     def analyze_flexibility(self, video_path: str, age: str, gender: str, show_overlay: bool = True) -> Dict:
         """Enhanced flexibility analysis"""
+        self._ensure_pose_available()
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
