@@ -1,14 +1,6 @@
-import importlib.util
 import json
 import os
-import tempfile
-from pathlib import Path
-
-from flask import Flask, jsonify, render_template_string, request
-
-
-PROJECT_ROOT = Path(__file__).resolve().parent
-MODULE_PATH = PROJECT_ROOT / "fitness_analyzer (2).py"
+from flask import Flask, jsonify, render_template_string
 
 app = Flask(__name__)
 

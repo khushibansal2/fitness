@@ -5,12 +5,27 @@ import math
 import time
 from typing import Dict, List, Tuple
 
-import cv2
-import mediapipe as mp
-import numpy as np
-from scipy import stats
+try:
+    import cv2
+except ImportError:  # pragma: no cover - optional runtime dependency
+    cv2 = None
 
-if not hasattr(mp, 'solutions'):
+try:
+    import mediapipe as mp
+except ImportError:  # pragma: no cover - optional runtime dependency
+    mp = None
+
+try:
+    import numpy as np
+except ImportError:  # pragma: no cover - optional runtime dependency
+    np = None
+
+try:
+    from scipy import stats
+except ImportError:  # pragma: no cover - optional runtime dependency
+    stats = None
+
+if mp is not None and not hasattr(mp, 'solutions'):
     try:
         mp.solutions = importlib.import_module('mediapipe.solutions')
     except ModuleNotFoundError:
