@@ -1,8 +1,13 @@
+import importlib.util
 import json
 import os
-from flask import Flask, jsonify, render_template_string
+import tempfile
+from pathlib import Path
+
+from flask import Flask, jsonify, render_template_string, request
 
 app = Flask(__name__)
+MODULE_PATH = Path(__file__).resolve().with_name("fitness_analyzer (2).py")
 
 
 HTML_TEMPLATE = """
