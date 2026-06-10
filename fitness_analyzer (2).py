@@ -41,7 +41,7 @@ class EnhancedFitnessAnalyzer:
         self.mp_drawing_styles = None
         self.pose = None
 
-        if mp.solutions is not None:
+        if mp is not None and getattr(mp, 'solutions', None) is not None:
             self.mp_pose = mp.solutions.pose
             self.mp_drawing = mp.solutions.drawing_utils
             self.mp_drawing_styles = mp.solutions.drawing_styles
